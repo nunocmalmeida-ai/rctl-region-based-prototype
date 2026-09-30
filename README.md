@@ -39,7 +39,15 @@ volume.tofile("volume.raw")
 print("Set X,Y,Z to:", volume.shape[2], volume.shape[1], volume.shape[0])
 ```
 
-No data volume is bundled or downloaded automatically. One public source of real 3D echocardiograms is the [EchoNet/3d-echo dataset release](https://github.com/echonet/3d-echo/releases/tag/v1.0) (29 author-recorded 3D echo volumes; download details and the associated paper are on the [project page](https://github.com/echonet/3d-echo)). Retrieve it from that release page; inspect the archive and convert an individual volume to the raw/NPY input format above. The upstream project requests citation of Vukadinovic et al., *Automated Interpretable 2D Video Extraction from 3D Echocardiography* (2025, [arXiv:2511.15946](https://arxiv.org/abs/2511.15946)). The release page/repository does not state a clear dataset license; verify the current terms with the authors before research redistribution, commercial use, or other use beyond viewing/downloading. Neither those volumes nor that study's annotations are bundled here.
+No data volume is bundled or downloaded automatically. One public source of real 3D echocardiograms is the [EchoNet/3d-echo dataset release](https://github.com/echonet/3d-echo/releases/tag/v1.0) (29 author-recorded 3D echo volumes; download details and the associated paper are on the [project page](https://github.com/echonet/3d-echo)). Reproducibly download and inspect the upstream archive with:
+
+```sh
+curl -fL https://github.com/echonet/3d-echo/releases/download/v1.0/dataset.zip -o /tmp/echonet-3d-echo-dataset.zip
+unzip -l /tmp/echonet-3d-echo-dataset.zip
+unzip /tmp/echonet-3d-echo-dataset.zip -d /tmp/echonet-3d-echo
+```
+
+Convert one compatible volume to the raw/NPY input format above; the archive is not a browser-ready fixture and this prototype does not pretend to include or automatically parse it. The upstream project requests citation of Vukadinovic et al., *Automated Interpretable 2D Video Extraction from 3D Echocardiography* (2025, [arXiv:2511.15946](https://arxiv.org/abs/2511.15946)). The release page/repository does not state a clear dataset license; verify the current terms with the authors before research redistribution, commercial use, or other use beyond viewing/downloading. Neither those volumes nor that study's annotations are bundled here.
 
 ## What is implemented (and simplified)
 
