@@ -85,6 +85,243 @@
           </section>
 
           <section class="control-section">
+            <h2>Pre-processing</h2>
+            <p class="muted">Classical filters applied to the volume before Stage 1 initialization and/or Stage 2 refinement. Up to two filters can be chained in order.</p>
+            <label>Filter 1
+              <select id="pre-1-type">
+                <option value="none">None (passthrough)</option>
+                <option value="gaussian">Gaussian smoothing (separable 3-D)</option>
+                <option value="median">Median filter (speckle suppression)</option>
+                <option value="anisotropic">Anisotropic diffusion (Perona–Malik)</option>
+                <option value="phase-congruency">Monogenic-style phase congruency (simplified 2-D)</option>
+                <option value="wavelet">Wavelet shrinkage despeckling (Haar)</option>
+              </select>
+            </label>
+            <div id="pre-1-params-gaussian" class="sub-params hidden">
+              <label>Sigma <output id="pre-1-gaussian-sigma-value"></output>
+                <input id="pre-1-gaussian-sigma" type="range" min="0.3" max="4" step="0.1" value="1" />
+              </label>
+            </div>
+            <div id="pre-1-params-median" class="sub-params hidden">
+              <label>Kernel size <output id="pre-1-median-kernel-value"></output>
+                <input id="pre-1-median-kernel" type="range" min="3" max="5" step="2" value="3" />
+              </label>
+            </div>
+            <div id="pre-1-params-anisotropic" class="sub-params hidden">
+              <label>Iterations <output id="pre-1-aniso-iterations-value"></output>
+                <input id="pre-1-aniso-iterations" type="range" min="1" max="20" value="6" />
+              </label>
+              <label>Conductance (kappa) <output id="pre-1-aniso-kappa-value"></output>
+                <input id="pre-1-aniso-kappa" type="range" min="2" max="60" value="20" />
+              </label>
+              <label>Edge-stopping function
+                <select id="pre-1-aniso-edge">
+                  <option value="exponential">Exponential</option>
+                  <option value="quadratic">Quadratic</option>
+                </select>
+              </label>
+            </div>
+            <div id="pre-1-params-phase-congruency" class="sub-params hidden">
+              <label>Sigma <output id="pre-1-pc-sigma-value"></output>
+                <input id="pre-1-pc-sigma" type="range" min="0.5" max="4" step="0.1" value="1.6" />
+              </label>
+            </div>
+            <div id="pre-1-params-wavelet" class="sub-params hidden">
+              <label>Threshold mode
+                <select id="pre-1-wavelet-mode">
+                  <option value="soft">Soft</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </label>
+              <label>Threshold scale <output id="pre-1-wavelet-scale-value"></output>
+                <input id="pre-1-wavelet-scale" type="range" min="0.1" max="3" step="0.1" value="1" />
+              </label>
+            </div>
+
+            <label>Filter 2 (applied after filter 1)
+              <select id="pre-2-type">
+                <option value="none">None (passthrough)</option>
+                <option value="gaussian">Gaussian smoothing (separable 3-D)</option>
+                <option value="median">Median filter (speckle suppression)</option>
+                <option value="anisotropic">Anisotropic diffusion (Perona–Malik)</option>
+                <option value="phase-congruency">Monogenic-style phase congruency (simplified 2-D)</option>
+                <option value="wavelet">Wavelet shrinkage despeckling (Haar)</option>
+              </select>
+            </label>
+            <div id="pre-2-params-gaussian" class="sub-params hidden">
+              <label>Sigma <output id="pre-2-gaussian-sigma-value"></output>
+                <input id="pre-2-gaussian-sigma" type="range" min="0.3" max="4" step="0.1" value="1" />
+              </label>
+            </div>
+            <div id="pre-2-params-median" class="sub-params hidden">
+              <label>Kernel size <output id="pre-2-median-kernel-value"></output>
+                <input id="pre-2-median-kernel" type="range" min="3" max="5" step="2" value="3" />
+              </label>
+            </div>
+            <div id="pre-2-params-anisotropic" class="sub-params hidden">
+              <label>Iterations <output id="pre-2-aniso-iterations-value"></output>
+                <input id="pre-2-aniso-iterations" type="range" min="1" max="20" value="6" />
+              </label>
+              <label>Conductance (kappa) <output id="pre-2-aniso-kappa-value"></output>
+                <input id="pre-2-aniso-kappa" type="range" min="2" max="60" value="20" />
+              </label>
+              <label>Edge-stopping function
+                <select id="pre-2-aniso-edge">
+                  <option value="exponential">Exponential</option>
+                  <option value="quadratic">Quadratic</option>
+                </select>
+              </label>
+            </div>
+            <div id="pre-2-params-phase-congruency" class="sub-params hidden">
+              <label>Sigma <output id="pre-2-pc-sigma-value"></output>
+                <input id="pre-2-pc-sigma" type="range" min="0.5" max="4" step="0.1" value="1.6" />
+              </label>
+            </div>
+            <div id="pre-2-params-wavelet" class="sub-params hidden">
+              <label>Threshold mode
+                <select id="pre-2-wavelet-mode">
+                  <option value="soft">Soft</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </label>
+              <label>Threshold scale <output id="pre-2-wavelet-scale-value"></output>
+                <input id="pre-2-wavelet-scale" type="range" min="0.1" max="3" step="0.1" value="1" />
+              </label>
+            </div>
+            <label class="check"><input id="pre-use-init" type="checkbox" /> Apply to Stage 1 initialization input</label>
+            <label class="check"><input id="pre-use-refine" type="checkbox" /> Apply to Stage 2 refinement input</label>
+          </section>
+
+          <section class="control-section">
+            <h2>Stage 1 · Coarse initialization</h2>
+            <p class="muted">Produces a candidate initial pose upstream of Stage 2 refinement — the step real systems most often fail at.</p>
+            <label>Method
+              <select id="init-method">
+                <option value="template">Multi-resolution template matching</option>
+                <option value="hough">Generalized Hough transform voting</option>
+                <option value="icp">ICP point-set alignment</option>
+                <option value="blob-pca">Blob centroid + PCA (naive baseline)</option>
+                <option value="manual">Manual / user-specified pose</option>
+              </select>
+            </label>
+
+            <div id="init-params-template" class="sub-params hidden">
+              <label>Grid step (finest, voxels) <output id="init-template-grid-value"></output>
+                <input id="init-template-grid" type="range" min="1" max="4" value="2" />
+              </label>
+              <label>Resolution levels <output id="init-template-levels-value"></output>
+                <input id="init-template-levels" type="range" min="1" max="4" value="3" />
+              </label>
+              <label>Rotation candidates (z-step, degrees) <output id="init-template-rot-step-value"></output>
+                <input id="init-template-rot-step" type="range" min="0" max="90" step="15" value="0" />
+              </label>
+              <label>Rotation candidate range (± degrees) <output id="init-template-rot-range-value"></output>
+                <input id="init-template-rot-range" type="range" min="0" max="90" step="15" value="0" />
+              </label>
+              <label>Similarity metric
+                <select id="init-template-metric">
+                  <option value="ncc">Normalized cross-correlation</option>
+                  <option value="ssd">Sum of squared differences</option>
+                  <option value="overlap">Thresholded bright-voxel overlap</option>
+                </select>
+              </label>
+              <label>Bright-voxel threshold <output id="init-template-threshold-value"></output>
+                <input id="init-template-threshold" type="range" min="0" max="255" value="150" />
+              </label>
+              <label>Candidates returned <output id="init-template-candidates-value"></output>
+                <input id="init-template-candidates" type="range" min="1" max="5" value="3" />
+              </label>
+            </div>
+
+            <div id="init-params-hough" class="sub-params hidden">
+              <label>Accumulator bin resolution (voxels) <output id="init-hough-bin-value"></output>
+                <input id="init-hough-bin" type="range" min="1" max="4" value="2" />
+              </label>
+              <label>Edge / bright-voxel threshold <output id="init-hough-threshold-value"></output>
+                <input id="init-hough-threshold" type="range" min="0" max="255" value="170" />
+              </label>
+              <label>R-table descriptor points <output id="init-hough-samples-value"></output>
+                <input id="init-hough-samples" type="range" min="16" max="96" step="8" value="48" />
+              </label>
+              <label>Peaks / candidates returned <output id="init-hough-candidates-value"></output>
+                <input id="init-hough-candidates" type="range" min="1" max="5" value="3" />
+              </label>
+            </div>
+
+            <div id="init-params-icp" class="sub-params hidden">
+              <label>Bright-voxel intensity threshold <output id="init-icp-threshold-value"></output>
+                <input id="init-icp-threshold" type="range" min="0" max="255" value="170" />
+              </label>
+              <label>Max iterations <output id="init-icp-iterations-value"></output>
+                <input id="init-icp-iterations" type="range" min="1" max="40" value="20" />
+              </label>
+              <label>Convergence tolerance <output id="init-icp-tolerance-value"></output>
+                <input id="init-icp-tolerance" type="range" min="0.001" max="0.2" step="0.001" value="0.01" />
+              </label>
+              <label>Outlier rejection percentile <output id="init-icp-outlier-value"></output>
+                <input id="init-icp-outlier" type="range" min="0.5" max="1" step="0.05" value="0.9" />
+              </label>
+              <label>Sampled volume points <output id="init-icp-volume-points-value"></output>
+                <input id="init-icp-volume-points" type="range" min="20" max="300" step="10" value="150" />
+              </label>
+              <label>Sampled model points <output id="init-icp-model-points-value"></output>
+                <input id="init-icp-model-points" type="range" min="20" max="150" step="10" value="80" />
+              </label>
+            </div>
+
+            <div id="init-params-blob-pca" class="sub-params hidden">
+              <label>Intensity threshold <output id="init-blob-threshold-value"></output>
+                <input id="init-blob-threshold" type="range" min="0" max="255" value="170" />
+              </label>
+              <label>Minimum blob volume (voxels) <output id="init-blob-min-value"></output>
+                <input id="init-blob-min" type="range" min="1" max="200" value="5" />
+              </label>
+              <label>Maximum blob volume (voxels) <output id="init-blob-max-value"></output>
+                <input id="init-blob-max" type="range" min="10" max="5000" step="10" value="3000" />
+              </label>
+              <label>Connectivity
+                <select id="init-blob-connectivity">
+                  <option value="6">6-connected</option>
+                  <option value="18">18-connected</option>
+                  <option value="26">26-connected</option>
+                </select>
+              </label>
+            </div>
+
+            <div id="init-params-manual" class="sub-params hidden">
+              <div class="field-grid three">
+                <label>X <input id="init-manual-x" type="number" min="0" max="47" value="24" /></label>
+                <label>Y <input id="init-manual-y" type="number" min="0" max="47" value="24" /></label>
+                <label>Z <input id="init-manual-z" type="number" min="0" max="47" value="24" /></label>
+              </div>
+              <div class="field-grid three">
+                <label>Rotate X <input id="init-manual-rx" type="number" min="-180" max="180" value="0" /></label>
+                <label>Rotate Y <input id="init-manual-ry" type="number" min="-180" max="180" value="0" /></label>
+                <label>Rotate Z <input id="init-manual-rz" type="number" min="-180" max="180" value="0" /></label>
+              </div>
+            </div>
+
+            <label class="check"><input id="init-perturb-enable" type="checkbox" /> Manual method: seed from perturbed ground truth (synthetic mode) instead of the X/Y/Z fields above</label>
+            <label>Perturbation translation (± voxels) <output id="init-perturb-translation-value"></output>
+              <input id="init-perturb-translation" type="range" min="0" max="15" value="5" />
+            </label>
+            <label>Perturbation rotation (± degrees) <output id="init-perturb-rotation-value"></output>
+              <input id="init-perturb-rotation" type="range" min="0" max="90" value="20" />
+            </label>
+
+            <button id="run-init" class="primary full">Run Stage 1 initialization</button>
+            <div id="init-status" class="muted">Not run yet.</div>
+            <div id="init-candidates" class="candidate-list"></div>
+
+            <label>Seed Stage 2 refinement from
+              <select id="seed-source">
+                <option value="coarse">Stage 1 coarse-initialization output</option>
+                <option value="naive">Naive baseline (volume center / manual pose)</option>
+              </select>
+            </label>
+          </section>
+
+          <section class="control-section">
             <h2>Detection / fitting</h2>
             <label>Measurement approach
               <select id="approach">
@@ -157,6 +394,11 @@
           <div class="disclaimer"><strong>Research prototype — not for clinical use.</strong>
             Results are educational synthetic-volume experiments, not validated medical segmentations.
           </div>
+          <div class="pipeline-diagram">
+            <div class="pipeline-stage"><b>Stage 1 · Coarse initialization</b>Global re-acquisition over the whole volume (template matching / generalized Hough / ICP / blob+PCA / manual). Outputs a candidate initial pose.<span id="pipeline-stage1-badge" class="stage-badge">not run</span></div>
+            <div class="pipeline-arrow">→</div>
+            <div class="pipeline-stage"><b>Stage 2 · Local refinement</b>Coordinate-descent fitting (fitting.js, unchanged) seeded from Stage 1's output (or a naive/manual baseline), analogous to a per-frame EKF measurement update.<span id="pipeline-stage2-badge" class="stage-badge">not run</span></div>
+          </div>
           <div class="slice-grid">
             <article class="slice-card"><div class="slice-title">AXIAL <span id="axial-label"></span></div><canvas id="axial"></canvas></article>
             <article class="slice-card"><div class="slice-title">CORONAL <span id="coronal-label"></span></div><canvas id="coronal"></canvas></article>
@@ -172,6 +414,12 @@
               <div class="slice-title">MODEL → MEASUREMENT → UPDATE</div>
               <p id="method-note">Region fitting compares robust local foreground and surrounding-background statistics.</p>
               <p class="muted">This browser prototype uses voxel-sampled coordinate descent, not RCTL’s production Kalman-filter / Doo–Sabin pipeline. “Smooth” fits an ellipsoid, “rigid” a fixed primitive, and “CAD-like” a primitive with one global scale parameter. No mesh rendering is implemented.</p>
+            </article>
+          </div>
+          <div class="results-grid">
+            <article class="result-card">
+              <div class="slice-title">PIPELINE METRICS <span id="pipeline-status">Stage 1 not run</span></div>
+              <div id="pipeline-metrics" class="metrics">Run Stage 1 initialization, then Stage 2 fitting, to compare initialization error against post-refinement error.</div>
             </article>
           </div>
           <footer>Slice intensities are normalized to 8-bit display. Object outline is the synthetic ground truth when available.</footer>
