@@ -259,7 +259,6 @@ function drawSlices() {
 
 function renderFit() {
   if (!state.embedded) regenerate();
-  const config = fitConfig();
   const object = state.embedded.truth;
   const seedSource = $("seed-source").value;
   const seedKey = seedSource === "coarse" && state.stage1.chosen
@@ -282,14 +281,17 @@ function renderFit() {
     initial = {
       center: state.embedded.dims.map((dimension) => (dimension - 1) / 2),
       radius: object ? object.radius * 0.85 : Math.min(...state.embedded.dims) * 0.14,
-      rotation: [...config.rotation]
+      rotation: [number("rotation-x"), number("rotation-y"), number("rotation-z")]
     };
     initSourceLabel = "Naive baseline (volume center)";
   }
+  // Read the fit configuration only after any rotation-field updates above, so a
+  // coarse-seeded candidate's rotation is reflected in the config used to fit.
+  const config = fitConfig();
   state.lastSeedKey = seedKey;
   state.lastInitSourceLabel = initSourceLabel;
   const volume = volumeWithPreprocessing("pre-use-refine") ?? state.embedded;
-  const fitted = fitVolume(volume, initial, fitConfig());
+  const fitted = fitVolume(volume, initial, config);
   if ($("temporal").checked && state.result) {
     fitted.pose.center = fitted.pose.center.map((position, axis) => position * 0.65 + state.result.pose.center[axis] * 0.35);
   }

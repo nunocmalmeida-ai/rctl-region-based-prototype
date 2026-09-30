@@ -68,8 +68,9 @@ export function gaussianSmooth3D(volume, options = {}) {
 // Full-fidelity: a real 3-D sliding-window median (cubic kernel, edge-clamped),
 // the classic speckle-suppression filter.
 export function medianFilter3D(volume, options = {}) {
-  const kernelSize = Math.max(1, Math.round(options.kernelSize ?? 3));
-  const half = Math.floor(kernelSize / 2);
+  const requestedSize = Math.max(1, Math.round(options.kernelSize ?? 3));
+  const half = Math.floor(requestedSize / 2);
+  const kernelSize = 2 * half + 1; // force an odd effective kernel size (even inputs round down)
   const [nx, ny, nz] = volume.dims;
   const data = new Float32Array(volume.data.length);
   const clamp = (value, max) => Math.max(0, Math.min(max, value));
