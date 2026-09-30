@@ -112,7 +112,9 @@ function edgeStop(gradient, kappa, kind) {
 export function anisotropicDiffusion3D(volume, options = {}) {
   const iterations = Math.max(1, Math.round(options.iterations ?? 6));
   const kappa = Math.max(1e-3, Number(options.kappa ?? 20));
-  const lambda = Math.max(0, Math.min(0.2, Number(options.lambda ?? 0.12)));
+  // Explicit-scheme stability bound on a 6-connected 3-D lattice is lambda <= 1/6;
+  // clamp there to avoid oscillation/divergence instead of the looser 0.2 used previously.
+  const lambda = Math.max(0, Math.min(1 / 6, Number(options.lambda ?? 0.12)));
   const edgeFunction = options.edgeFunction === "quadratic" ? "quadratic" : "exponential";
   const [nx, ny, nz] = volume.dims;
   let data = new Float32Array(volume.data);
