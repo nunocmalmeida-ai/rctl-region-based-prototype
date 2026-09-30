@@ -537,11 +537,12 @@ export function connectedComponents(volume, threshold, connectivity = 6) {
       for (let x = 0; x < nx; x += 1) {
         const idx = index3d(volume.dims, x, y, z);
         if (visited[idx] || volume.data[idx] < threshold) continue;
-        const queue = [[x, y, z]];
+        // DFS flood-fill using an explicit stack (push/pop = LIFO).
+        const stack = [[x, y, z]];
         visited[idx] = 1;
         const points = [];
-        while (queue.length) {
-          const [cx, cy, cz] = queue.pop();
+        while (stack.length) {
+          const [cx, cy, cz] = stack.pop();
           points.push([cx, cy, cz]);
           for (const [dx, dy, dz] of offsets) {
             const nxp = cx + dx;
@@ -551,7 +552,7 @@ export function connectedComponents(volume, threshold, connectivity = 6) {
             const nidx = index3d(volume.dims, nxp, nyp, nzp);
             if (visited[nidx] || volume.data[nidx] < threshold) continue;
             visited[nidx] = 1;
-            queue.push([nxp, nyp, nzp]);
+            stack.push([nxp, nyp, nzp]);
           }
         }
         components.push(points);
