@@ -251,7 +251,7 @@ function softOrHardThreshold(value, t, mode) {
   return Math.sign(value) * (Math.abs(value) - t);
 }
 
-function estimateUniversalThreshold(full, rows, cols, halfRows, halfCols, multiplier) {
+function estimateUniversalThreshold(full, rows, cols, halfRows, halfCols, thresholdScale) {
   const hh = [];
   for (let r = halfRows; r < rows; r += 1) {
     for (let c = halfCols; c < cols; c += 1) hh.push(full[r][c]);
@@ -263,7 +263,7 @@ function estimateUniversalThreshold(full, rows, cols, halfRows, halfCols, multip
   const mad = deviations[Math.floor(deviations.length / 2)];
   const sigma = mad / 0.6745;
   const n = Math.max(2, rows * cols);
-  return multiplier * sigma * Math.sqrt(2 * Math.log(n));
+  return thresholdScale * sigma * Math.sqrt(2 * Math.log(n));
 }
 
 export function waveletDespeckle2D(volume, options = {}) {
