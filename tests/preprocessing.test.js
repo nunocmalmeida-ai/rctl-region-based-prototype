@@ -55,6 +55,26 @@ test("median filtering removes an isolated salt-noise spike while preserving fla
   assert.equal(filtered.data[0], 40);
 });
 
+test("median filtering with an even kernelSize forces an odd effective kernel and does not drop writes", () => {
+  const dims = [7, 7, 7];
+  const [nx, ny, nz] = dims;
+  const data = new Float32Array(nx * ny * nz).fill(40);
+  const cx = 3;
+  const cy = 3;
+  const cz = 3;
+  data[cz * ny * nx + cy * nx + cx] = 255;
+  const volume = { dims, data, mask: null, truth: null, label: "spike" };
+  // kernelSize=4 previously allocated a window of 4**3=64 while the sliding
+  // window loop (2*half+1=5 per axis) wrote up to 5**3=125 samples, silently
+  // dropping writes and corrupting the median. It must now behave like kernelSize=5.
+  const filteredEven = medianFilter3D(volume, { kernelSize: 4 });
+  const filteredOdd = medianFilter3D(volume, { kernelSize: 5 });
+  const centerIndex = cz * ny * nx + cy * nx + cx;
+  assert.deepEqual(Array.from(filteredEven.data), Array.from(filteredOdd.data));
+  assert.equal(filteredEven.data[centerIndex], 40);
+  assert.equal(filteredEven.data[0], 40);
+});
+
 test("anisotropic diffusion smooths within a flat region while damping across a strong step edge", () => {
   const dims = [10, 6, 6];
   const [nx, ny, nz] = dims;
