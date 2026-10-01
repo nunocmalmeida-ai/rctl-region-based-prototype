@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101923" />
+    <title>RCTL · Region-based ultrasound prototype</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">RESEARCH SANDBOX · 3D ULTRASOUND</div>
+          <h1>RCTL <span>Region-based fitting lab</span></h1>
+        </div>
+        <div id="dataset-badge" class="badge">Synthetic demo</div>
+      </header>
+      <main class="layout">
+        <aside class="controls">
+          <section class="control-section">
+            <h2>Dataset</h2>
+            <p class="muted">The built-in phantom is synthetic—not a patient scan.</p>
+            <label class="file-button">Load local uint8 volume
+              <input id="volume-file" type="file" accept=".raw,.bin,.npy" />
+            </label>
+            <div class="field-grid three">
+              <label>X <input id="dim-x" type="number" min="2" max="512" value="48" /></label>
+              <label>Y <input id="dim-y" type="number" min="2" max="512" value="48" /></label>
+              <label>Z <input id="dim-z" type="number" min="2" max="512" value="48" /></label>
+            </div>
+            <button id="load-volume" class="secondary">Load selected raw / NPY</button>
+            <button id="reset-demo" class="text-button">Restore synthetic demo</button>
+          </section>
+
+          <section class="control-section">
+            <h2>Embedded object</h2>
+            <label>Procedural object
+              <select id="shape">
+                <option value="sphere">Sphere</option>
+                <option value="box">Rigid box</option>
+                <option value="cylinder">Cylinder</option>
+                <option value="torus">Torus</option>
+                <option value="frame">Implant-like frame</option>
+              </select>
+            </label>
+            <label>Object size <output id="size-value"></output>
+              <input id="size" type="range" min="3" max="13" value="7" />
+            </label>
+            <div class="field-grid three">
+              <label>X <input id="object-x" type="number" min="0" max="47" value="27" /></label>
+              <label>Y <input id="object-y" type="number" min="0" max="47" value="23" /></label>
+              <label>Z <input id="object-z" type="number" min="0" max="47" value="25" /></label>
+            </div>
+            <div class="field-grid three">
+              <label>Rotate X <input id="rotation-x" type="number" min="-180" max="180" value="0" /></label>
+              <label>Rotate Y <input id="rotation-y" type="number" min="-180" max="180" value="0" /></label>
+              <label>Rotate Z <input id="rotation-z" type="number" min="-180" max="180" value="25" /></label>
+            </div>
+            <label>Echogenicity <output id="intensity-value"></output>
+              <input id="intensity" type="range" min="80" max="255" value="245" />
+            </label>
+            <label>Blend strength <output id="blend-value"></output>
+              <input id="blend" type="range" min="0" max="100" value="90" />
+            </label>
+            <label class="check"><input id="shadow" type="checkbox" checked /> Acoustic shadow</label>
+            <div class="button-row">
+              <button id="embed" class="primary">Embed / regenerate</button>
+              <button id="randomize" class="secondary">Randomize</button>
+            </div>
+          </section>
+
+          <section class="control-section">
+            <h2>Noise / artifacts</h2>
+            <label>Gaussian noise <output id="gaussian-value"></output>
+              <input id="gaussian" type="range" min="0" max="60" value="8" />
+            </label>
+            <label>Speckle noise <output id="speckle-value"></output>
+              <input id="speckle" type="range" min="0" max="100" value="12" />
+            </label>
+            <label>Signal dropout <output id="dropout-value"></output>
+              <input id="dropout" type="range" min="0" max="30" value="2" />
+            </label>
+            <label class="check"><input id="clip" type="checkbox" checked /> Clip to display range [0, 255]</label>
+            <label>Deterministic seed <input id="seed" type="number" min="0" max="4294967295" value="21" /></label>
+          </section>
+
+          <section class="control-section">
+            <h2>Detection / fitting</h2>
+            <label>Measurement approach
+              <select id="approach">
+                <option value="region">Region mean / variance</option>
+                <option value="edge">Edge / normal profile</option>
+                <option value="likelihood">Bright-vs-background likelihood ratio</option>
+                <option value="template">Thin-shell template</option>
+                <option value="hybrid">Hybrid region + template</option>
+              </select>
+            </label>
+            <label>Model representation
+              <select id="representation">
+                <option value="smooth">Smooth parametric (ellipsoid)</option>
+                <option value="rigid">Rigid procedural mesh</option>
+                <option value="cad">CAD-like, low-dimensional scale</option>
+              </select>
+            </label>
+            <label>Optimizer iterations <output id="iterations-value"></output>
+              <input id="iterations" type="range" min="1" max="12" value="6" />
+            </label>
+            <label>Profile search radius <output id="search-radius-value"></output>
+              <input id="search-radius" type="range" min="1" max="8" value="4" />
+            </label>
+            <label>Sample count <output id="samples-value"></output>
+              <input id="samples" type="range" min="100" max="3000" step="100" value="900" />
+            </label>
+            <label>Region / window width <output id="window-value"></output>
+              <input id="window" type="range" min="1" max="6" value="3" />
+            </label>
+            <label>Regularization <output id="regularization-value"></output>
+              <input id="regularization" type="range" min="0" max="100" value="8" />
+            </label>
+            <label>Intensity threshold <output id="threshold-value"></output>
+              <input id="threshold" type="range" min="0" max="255" value="130" />
+            </label>
+            <label>Robust residual
+              <select id="robust-loss">
+                <option value="huber">Huber</option>
+                <option value="l1">Absolute (L1)</option>
+                <option value="quadratic">Quadratic</option>
+              </select>
+            </label>
+            <label class="check"><input id="temporal" type="checkbox" /> Temporal exponential smoothing</label>
+            <button id="fit" class="primary full">Fit model to volume</button>
+          </section>
+
+          <section class="control-section">
+            <h2>Visualization</h2>
+            <label>Display
+              <select id="view-mode">
+                <option value="overlay">Embedded + ground truth overlay</option>
+                <option value="embedded">Embedded volume</option>
+                <option value="base">Original / base volume</option>
+                <option value="difference">Absolute difference</option>
+              </select>
+            </label>
+            <label>Axial Z <output id="slice-z-value"></output>
+              <input id="slice-z" type="range" min="0" max="47" value="25" />
+            </label>
+            <label>Coronal Y <output id="slice-y-value"></output>
+              <input id="slice-y" type="range" min="0" max="47" value="23" />
+            </label>
+            <label>Sagittal X <output id="slice-x-value"></output>
+              <input id="slice-x" type="range" min="0" max="47" value="27" />
+            </label>
+          </section>
+        </aside>
+
+        <section class="workspace">
+          <div class="disclaimer"><strong>Research prototype — not for clinical use.</strong>
+            Results are educational synthetic-volume experiments, not validated medical segmentations.
+          </div>
+          <div class="slice-grid">
+            <article class="slice-card"><div class="slice-title">AXIAL <span id="axial-label"></span></div><canvas id="axial"></canvas></article>
+            <article class="slice-card"><div class="slice-title">CORONAL <span id="coronal-label"></span></div><canvas id="coronal"></canvas></article>
+            <article class="slice-card"><div class="slice-title">SAGITTAL <span id="sagittal-label"></span></div><canvas id="sagittal"></canvas></article>
+          </div>
+          <div class="results-grid">
+            <article class="result-card">
+              <div class="slice-title">FIT RESULT <span id="fit-status">Not fitted</span></div>
+              <div id="metrics" class="metrics">Generate an embedded object, then run fitting.</div>
+              <div id="history" class="history"></div>
+            </article>
+            <article class="result-card">
+              <div class="slice-title">MODEL → MEASUREMENT → UPDATE</div>
+              <p id="method-note">Region fitting compares robust local foreground and surrounding-background statistics.</p>
+              <p class="muted">This browser prototype uses voxel-sampled coordinate descent, not RCTL’s production Kalman-filter / Doo–Sabin pipeline. “Smooth” fits an ellipsoid, “rigid” a fixed primitive, and “CAD-like” a primitive with one global scale parameter. No mesh rendering is implemented.</p>
+            </article>
+          </div>
+          <footer>Slice intensities are normalized to 8-bit display. Object outline is the synthetic ground truth when available.</footer>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>
